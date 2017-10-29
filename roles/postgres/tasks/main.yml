@@ -1,0 +1,53 @@
+- name: Install Python Requirements - Step 1
+  yum:
+   name: "python-setuptools"
+   state: present
+  sudo: yes
+
+- name: Install Python Requrements - Step 2
+  yum:
+   name: "python-setuptools-devel"
+   state: present
+  sudo: yes
+
+- name: Copy rpm file to server
+  yum:
+   name: "https://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-3.noarch.rpm"
+   state: present
+  sudo: yes
+
+- name: Installing PostgreSQL Server
+  yum:
+   name: "postgresql95-server"
+   state: present
+  sudo: yes
+- name: Installing PostgreSQL
+  yum:
+   name: "postgresql95"
+   state: present
+  sudo: yes
+
+- name: Enabling PostgreSQL
+  service:
+   name: postgresql-9.5
+   enabled: yes
+  sudo: yes
+
+- name: Init Database Script
+  command: sudo /usr/pgsql-9.5/bin/postgresql95-setup initdb
+  ignore_errors: yes
+  sudo: yes
+
+- copy:
+   src: pg_hba.conf
+   dest: /var/lib/pgsql/9.5/data/pg_hba.conf
+   owner: root
+   group: wheel
+   mode: 0644
+  sudo: yes   
+
+- name: Starting PostgreSQL
+  service:
+   name: postgresql-9.5
+   state: restarted
+  sudo: yes
